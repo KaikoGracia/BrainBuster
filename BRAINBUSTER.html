@@ -1,0 +1,185 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>BrainBuster - ICT Quiz</title>
+  <style>
+    /* [Your existing styles remain unchanged] */
+    /* ... ALL the CSS you posted above ... */
+  </style>
+</head>
+<body>
+
+  <h1>🧠 Brain Buster</h1>
+
+  <div class="container">
+    <input type="text" id="username" placeholder="Enter your name" />
+    <button id="start" onclick="startQuiz()">Start Quiz</button>
+
+    <div class="card" id="card">
+      <div id="question" style="font-weight: bold; margin-bottom: 20px;"></div>
+      <div id="options"></div>
+      <button id="next" style="display: none;" onclick="nextQuestion()">Next</button>
+    </div>
+
+    <div class="progress-bar-container">
+      <div id="progress-bar" class="progress-bar"></div>
+    </div>
+
+    <div id="scoreboard"></div>
+  </div>
+
+  <div class="fixed-bottom-panels">
+    <div class="panel" id="player-panel">
+      <h3>Player:</h3>
+      <div id="player-name">Not Started</div>
+    </div>
+
+    <div class="panel" id="scoreboard-panel">
+      <h3>Your Score:</h3>
+      <div id="player-score">Not Available</div>
+    </div>
+  </div>
+
+  <!-- Sounds -->
+  <audio id="correctSound" src="https://www.myinstants.com/media/sounds/correct-answer.mp3"></audio>
+  <audio id="wrongSound" src="https://www.myinstants.com/media/sounds/wrong-answer.mp3"></audio>
+  <audio id="completeSound" src="https://www.myinstants.com/media/sounds/tada-fanfare.mp3"></audio>
+
+  <!-- JavaScript Logic -->
+  <script>
+    const questions = [
+      {
+        question: "What does ICT stand for?",
+        options: ["Information and Communication Technology", "Internet and Computer Technology", "International Communication Trends", "Information Control Technique"],
+        answer: "Information and Communication Technology"
+      },
+      {
+        question: "Which device is used to input text?",
+        options: ["Monitor", "Keyboard", "Mouse", "Printer"],
+        answer: "Keyboard"
+      },
+      {
+        question: "Which one is an example of software?",
+        options: ["Hard disk", "RAM", "Microsoft Word", "Keyboard"],
+        answer: "Microsoft Word"
+      },
+      {
+        question: "Which of these is a search engine?",
+        options: ["Google", "Facebook", "Windows", "Excel"],
+        answer: "Google"
+      },
+      {
+        question: "What is the brain of the computer?",
+        options: ["Monitor", "RAM", "CPU", "Mouse"],
+        answer: "CPU"
+      }
+    ];
+
+    let currentQuestion = 0;
+    let score = 0;
+
+    const usernameInput = document.getElementById("username");
+    const playerName = document.getElementById("player-name");
+    const playerScore = document.getElementById("player-score");
+    const questionText = document.getElementById("question");
+    const optionsContainer = document.getElementById("options");
+    const card = document.getElementById("card");
+    const nextBtn = document.getElementById("next");
+    const progressBar = document.getElementById("progress-bar");
+    const scoreboard = document.getElementById("scoreboard");
+
+    const correctSound = document.getElementById("correctSound");
+    const wrongSound = document.getElementById("wrongSound");
+    const completeSound = document.getElementById("completeSound");
+
+    function startQuiz() {
+      const name = usernameInput.value.trim();
+      if (!name) {
+        alert("Please enter your name to start.");
+        return;
+      }
+
+      playerName.textContent = name;
+      playerScore.textContent = "0";
+      currentQuestion = 0;
+      score = 0;
+      card.style.display = "block";
+      scoreboard.style.display = "none";
+      nextBtn.style.display = "none";
+      usernameInput.disabled = true;
+      document.getElementById("start").disabled = true;
+
+      showQuestion();
+    }
+
+    function showQuestion() {
+      const q = questions[currentQuestion];
+      questionText.textContent = q.question;
+      optionsContainer.innerHTML = "";
+
+      q.options.forEach(option => {
+        const btn = document.createElement("button");
+        btn.textContent = option;
+        btn.className = "option";
+        btn.onclick = () => selectAnswer(btn, q.answer);
+        optionsContainer.appendChild(btn);
+      });
+
+      updateProgressBar();
+    }
+
+    function selectAnswer(button, correctAnswer) {
+      const options = document.querySelectorAll(".option");
+
+      options.forEach(btn => {
+        btn.disabled = true;
+        if (btn.textContent === correctAnswer) {
+          btn.classList.add("correct");
+        }
+      });
+
+      if (button.textContent === correctAnswer) {
+        score++;
+        playerScore.textContent = score;
+        correctSound.play();
+      } else {
+        button.classList.add("wrong");
+        wrongSound.play();
+      }
+
+      nextBtn.style.display = "block";
+    }
+
+    function nextQuestion() {
+      currentQuestion++;
+      if (currentQuestion < questions.length) {
+        showQuestion();
+        nextBtn.style.display = "none";
+      } else {
+        endQuiz();
+      }
+    }
+
+    function updateProgressBar() {
+      const progress = ((currentQuestion) / questions.length) * 100;
+      progressBar.style.width = `${progress}%`;
+    }
+
+    function endQuiz() {
+      card.style.display = "none";
+      scoreboard.style.display = "block";
+      completeSound.play();
+
+      scoreboard.innerHTML = `
+        <h2>🎉 Quiz Complete!</h2>
+        <p><strong>${playerName.textContent}</strong>, you scored <strong>${score}</strong> out of <strong>${questions.length}</strong>.</p>
+      `;
+
+      progressBar.style.width = "100%";
+    }
+  </script>
+
+</body>
+</html>
